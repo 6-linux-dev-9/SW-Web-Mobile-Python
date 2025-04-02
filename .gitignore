@@ -1,0 +1,21 @@
+# Ignorar archivos de compilación de Python
+__pycache__/
+*.pyc
+
+# Ignorar entorno virtual
+flask_env/
+venv/
+
+# Ignorar archivos de configuración confidenciales
+.env
+
+# Ignorar otros archivos generados
+*.log
+
+# Ignorar archivos específicos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar configuraciones de IDEs y editores (opcional, si usas uno como VS Code)
+.vscode/
+.idea/
