@@ -6,6 +6,8 @@ from app.database import db
 from sqlalchemy import Boolean, Integer, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.utils.enums.enums import Sesion
+
 """"
 # from flask_sqlalchemy import SQLAlchemy
 #manera anterior
@@ -83,15 +85,15 @@ class SoftDeleteMixin:
         return cls.query.filter_by(is_deleted=False)
 
 # Modelo de Usuario
-class Usuario(db.Model, TimestampMixin):
+class Usuario(db.Model, TimestampMixin,SoftDeleteMixin):
     __tablename__ = 'usuarios'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(80), nullable=False, unique=True)
+    username: Mapped[str] = mapped_column(String(80), nullable=False)
+    nombre: Mapped[str] = mapped_column(String(80),nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(200), nullable=False)
     rol_id: Mapped[int] = mapped_column(Integer, db.ForeignKey('roles.id'), nullable=False)
-    
     # Relación con el modelo Rol
     #esto hace que la clase Rol tenga un atributo usuarios
     rol: Mapped["Rol"] = relationship('Rol', back_populates='usuarios')
@@ -141,3 +143,11 @@ class RolPermiso(db.Model, TimestampMixin):
     rol_id: Mapped[int] = mapped_column(Integer, db.ForeignKey('roles.id'), primary_key=True)
     permiso_id: Mapped[int] = mapped_column(Integer, db.ForeignKey('permisos.id'), primary_key=True)
 
+class BitacoraUsuario(db.Model,TimestampMixin):
+    __tablename__ = 'bitacora_usuarios'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    ip : Mapped[str] = mapped_column(String,nullable=False)
+    username : Mapped[str] = mapped_column(String(40))
+    tipo_accion : Mapped[str] = mapped_column(String(1))
+    def __repr__(self):
+        return f"<Bitacora_usuario> ip: {self.ip}\n username: {self.username}\ntipo_accion: {Sesion.get_by_char(self.tipo_accion).get_descripcion()}"

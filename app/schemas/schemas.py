@@ -1,7 +1,9 @@
-from marshmallow import fields
+from pyexpat import model
+from marshmallow import ValidationError, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from app.models import Usuario, Rol, Permiso #importar los modelos
+from app.models import BitacoraUsuario, Usuario, Rol, Permiso #importar los modelos
 from app.database import db
+from app.utils.enums.enums import Sesion
 
 
 #puros esquemas para las respuestas en formato json
@@ -35,5 +37,19 @@ class PermisoSchema(SQLAlchemyAutoSchema):
 
     roles = fields.List(fields.Nested("RolSchema", only=["id", "nombre"]))  # Evita el bucle
 
+class BitacoraUsuarioSchema(SQLAlchemyAutoSchema):
+    tipo_accion = fields.Method("get_tipo_accion")
+    class Meta:
+        model = BitacoraUsuario
+        load_instance = True
+        sqla_session = db.session
+
+    def get_tipo_accion(self,obj):
+        try:
+            return Sesion.get_by_char(obj.tipo_accion).get_descripcion()
+        except (ValueError,AttributeError):
+            raise ValidationError("Error en la conversion de datos")
+        
+    
 
   

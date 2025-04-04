@@ -4,6 +4,7 @@ from flask import current_app
 
 def encode_auth_token(user_id):
     try:
+        
         payload = {
             'exp': datetime.now(timezone.utc) + timedelta(hours=1),  # Expira en 1 hr,minutes, days
             'iat': datetime.now(timezone.utc),
@@ -16,8 +17,11 @@ def encode_auth_token(user_id):
 #obtiene el id del usuario
 def decode_auth_token(auth_token):
     try:
+        
         payload = jwt.decode(auth_token, current_app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-        return payload['sub']  # ID del usuario
+        print(f"decode {payload}")
+        #return payload['sub']  # ID del usuario
+        return payload
     except jwt.ExpiredSignatureError:
         return "Signature expired. Please log in again."
     except jwt.InvalidTokenError:
