@@ -1,7 +1,6 @@
-from pyexpat import model
 from marshmallow import ValidationError, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from app.models import BitacoraUsuario, Usuario, Rol, Permiso #importar los modelos
+from app.models import BitacoraUsuario, Marca, Usuario, Rol, Permiso #importar los modelos
 from app.database import db
 from app.utils.enums.enums import Sesion
 
@@ -43,13 +42,27 @@ class BitacoraUsuarioSchema(SQLAlchemyAutoSchema):
         model = BitacoraUsuario
         load_instance = True
         sqla_session = db.session
-
+    #para parsear el dato de la bd a un dato entendible
     def get_tipo_accion(self,obj):
         try:
             return Sesion.get_by_char(obj.tipo_accion).get_descripcion()
         except (ValueError,AttributeError):
             raise ValidationError("Error en la conversion de datos")
         
+class MarcasSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Marca
+        load_instance = True
+        sqla_session = db.session
+
+class CategoriaSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Marca
+        load_instance = True
+        sqla_session = db.session
+    marcas = fields.List(fields.Nested("MarcasSchema",only=["id","nombre"]))
+    
+    
     
 
   

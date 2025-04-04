@@ -3,7 +3,7 @@ from datetime import timezone
 
 #muy importante importar correctamente la base de datos definida en database
 from app.database import db
-from sqlalchemy import Boolean, Integer, String, DateTime
+from sqlalchemy import Boolean, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.utils.enums.enums import Sesion
@@ -151,3 +151,32 @@ class BitacoraUsuario(db.Model,TimestampMixin):
     tipo_accion : Mapped[str] = mapped_column(String(1))
     def __repr__(self):
         return f"<Bitacora_usuario> ip: {self.ip}\n username: {self.username}\ntipo_accion: {Sesion.get_by_char(self.tipo_accion).get_descripcion()}"
+    
+
+class Marca(db.Model,TimestampMixin,SoftDeleteMixin):
+    __tablename__ = 'marcas'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(40),nullable=False)
+    categorias: Mapped[list["Categoria"]] = relationship('Categoria',
+                                                         secondary='marca_categoria',
+                                                         back_populates='marcas'
+                                                         )    
+    def __repr__(self):
+        return f"<Marca> {self.nombre}"
+
+#relacion recursiva
+class Categoria(db.Model,TimestampMixin,SoftDeleteMixin):
+    __tablename__ = "categorias"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(40),nullable=False)
+    #relacion con marcas
+    marcas: Mapped[list["Marca"]] = relationship('Marca',
+                                                 secondary='marca_categoria',
+                                                 back_populates='categorias')
+    def __repr__(self):
+        return f"<Categoria>: nombre: {self.nombre}"
+
+class MarcaCategoria(db.Model,TimestampMixin):
+    __tablename__ = "marca_categoria"
+    id_marca: Mapped[int] = mapped_column(Integer,ForeignKey('marcas.id'),primary_key=True)
+    id_categoria: Mapped[int] = mapped_column(Integer,ForeignKey('categorias.id'),primary_key=True)

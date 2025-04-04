@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import Blueprint, request,jsonify
 from marshmallow import ValidationError
-from psycopg2 import IntegrityError #usaremos el request para acceder al request, jsonify para usar respuestas json
+#from psycopg2 import IntegrityError #usaremos el request para acceder al request, jsonify para usar respuestas json
 from app.errors.errors import GenericError
 from app.models import Permiso, Rol #hacemos referencia al modelo usuario por a ese modelo consultaremos
 from app.database import db  #usaremos la instancia a la base de datos
